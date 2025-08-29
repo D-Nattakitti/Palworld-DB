@@ -1,0 +1,1 @@
+console.log("อั่นแหนะ แอบดู source code หรอ? 😜"); 
