@@ -15,4 +15,11 @@ main {
 }
 footer {
     text-align: center;
+    background-color: #181818;
+    color: white;
+}
+
+#divbar {
+    background-color: blue;
+    top: 100px;
 }
