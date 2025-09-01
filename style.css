@@ -1,25 +1,63 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: ghostwhite;
-
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f5f7fa;
 }
+
 header {
-    padding: 10px 0;
-    text-align: center;
-}
-main {
-    padding: 20px;
-    text-align: center;
-}
-footer {
-    text-align: center;
-    background-color: #181818;
-    color: white;
+  text-align: center;
+  padding: 20px;
+  background: #2b3a55;
+  color: white;
 }
 
-#divbar {
-    background-color: blue;
-    top: 100px;
+#search {
+  margin-top: 10px;
+  padding: 8px;
+  width: 200px;
+  border-radius: 5px;
+  border: none;
+}
+
+#admin-form {
+  padding: 20px;
+  background: #eef;
+}
+
+#admin-form input {
+  display: block;
+  margin-bottom: 10px;
+  padding: 5px;
+  width: 200px;
+}
+
+#admin-form button {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+#pal-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  list-style: none;
+  padding: 20px;
+}
+
+.pal-card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.pal-card:hover {
+  transform: scale(1.05);
+}
+
+.pal-card img {
+  max-width: 100px;
+  margin-bottom: 10px;
 }

@@ -1,32 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Palworld-DB</title>
-    <link rel="stylesheet" href="style.css">
-    
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palworld DB</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <nav>
-            Palworld Database
-        </nav>
-    </header>
-    <main>
-        <h1>Welcome to Palworld-DB</h1>
-        <img src="" alt="">
-        <p>Your comprehensive database for all things Palworld.</p>
-        <section>
-            <div class="divbar">
+  <header>
+    <h1>Palworld Database</h1>
+    <input type="text" id="search" placeholder="Search Pal...">
+  </header>
 
-            </div>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2024 Palworld-DB. All rights reserved.</p>
-        <p>by <a href="https://github.com/D-Nattakitti"  style="color: white;">Nattakitti</a></p>
-    </footer>
-    <script src="script.js"></script>
+  <main>
+    <ul id="pal-list"></ul>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    // เรียกฟังก์ชัน render สำหรับหน้าเว็บหลัก
+    renderPals();
+  </script>
 </body>
 </html>

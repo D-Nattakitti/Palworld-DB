@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palworld Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Palworld Admin</h1>
+  </header>
+
+  <section id="admin-form">
+    <h2>Add New Pal</h2>
+    <input type="text" id="pal-name" placeholder="Name">
+    <input type="text" id="pal-type" placeholder="Type">
+    <input type="number" id="pal-level" placeholder="Level">
+    <input type="text" id="pal-description" placeholder="Description">
+    <input type="text" id="pal-image" placeholder="Image URL">
+    <button id="add-pal">Add Pal</button>
+  </section>
+
+  <main>
+    <ul id="pal-list"></ul>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    // เรียกฟังก์ชัน render สำหรับหน้า Admin
+    renderPals();
+    setupAdmin();
+  </script>
+</body>
+</html>
