@@ -1,15 +1,167 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>SKy</title>
-    </head>
-    <body>
-        dsdsadasd
-        <h1>543545</h1>
-        <div style="background-color: red;"> 
-            test
-        </div>
-    </body>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Palworld DB</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .filter-bar {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .filter-bar input,
+    .filter-bar select {
+      padding: 6px 10px;
+      font-size: 1rem;
+    }
+    #pal-list {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .pal-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .pal-card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+    }
+    .pal-card .content {
+      padding: 12px;
+      flex: 1;
+    }
+    .pal-type {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .pal-type .type-icon {
+      width: 20px;
+      height: 20px;
+    }
+    .pal-card h2 {
+      margin: 0 0 6px;
+      font-size: 1.2rem;
+    }
+    .pal-card p {
+      margin: 4px 0;
+      font-size: 0.9rem;
+    }
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="filter-bar">
+    <input type="text" id="search" placeholder="ค้นหา Pal..." />
+    <select id="filterType">
+      <option value="">All Types</option>
+      <option value="Dark">Dark</option>
+      <option value="Fire">Fire</option>
+      <option value="Water">Water</option>
+      <option value="Grass">Grass</option>
+      <!-- เพิ่ม type ตามต้องการ -->
+    </select>
+  </div>
+
+  <ul id="pal-list">
+    <!-- card Pal จะถูกใส่ที่นี่ -->
+  </ul>
+
+  <script>
+    // สมมุติ icons ตาม type
+    const typeIcons = {
+      Dark: "icons/dark.png",
+      Fire: "icons/fire.png",
+      Water: "icons/water.png",
+      Grass: "icons/grass.png",
+      // เพิ่มตามที่มี
+    };
+
+    let palData = [];
+
+    fetch("https://d-nattakitti.github.io/Palworlddb_db/pals.json")
+      .then(res => res.json())
+      .then(data => {
+        palData = data;
+        renderPals(palData);
+      })
+      .catch(err => console.error("Error loading pals:", err));
+
+    function renderPals(data) {
+      const palList = document.getElementById("pal-list");
+      palList.innerHTML = "";
+
+      data.forEach(pal => {
+        const li = document.createElement("li");
+        li.className = "pal-card";
+        li.dataset.type = pal.type;
+
+        const icon = typeIcons[pal.type] || "icons/default.png";
+
+        li.innerHTML = `
+          <img src="${pal.image}" alt="${pal.name}" />
+          <div class="content">
+            <div class="pal-type">
+              <img src="${icon}" alt="${pal.type} icon" class="type-icon" />
+              <span>${pal.type}</span>
+            </div>
+            <h2>${pal.name}</h2>
+            <p>Level: ${pal.level ?? "N/A"}</p>
+            <p>${pal.description}</p>
+          </div>
+        `;
+
+        palList.appendChild(li);
+      });
+    }
+
+    // Filter + Search together
+    const searchInput = document.getElementById("search");
+    const filterSelect = document.getElementById("filterType");
+
+    function applyFilters() {
+      const searchValue = searchInput.value.toLowerCase();
+      const typeValue = filterSelect.value;
+
+      document.querySelectorAll(".pal-card").forEach(card => {
+        const name = card.querySelector("h2").textContent.toLowerCase();
+        const type = card.dataset.type;
+
+        const matchesSearch = name.includes(searchValue);
+        const matchesType = typeValue === "" || type === typeValue;
+
+        if (matchesSearch && matchesType) {
+          card.classList.remove("hidden");
+        } else {
+          card.classList.add("hidden");
+        }
+      });
+    }
+
+    searchInput.addEventListener("input", applyFilters);
+    filterSelect.addEventListener("change", applyFilters);
+
+  </script>
+
+</body>
 </html>

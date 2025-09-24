@@ -61,3 +61,15 @@ header {
   max-width: 100px;
   margin-bottom: 10px;
 }
+
+.pal-type {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+}
+
+.type-icon {
+  width: 20px;
+  height: 20px;
+}
