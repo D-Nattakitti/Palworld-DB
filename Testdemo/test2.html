@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palworld Database</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Black', 'Arial', sans-serif;
+            background: #1a1d2e;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .container {
+            padding: 40px 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .header-line {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .header-line::before,
+        .header-line::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #4a5568, transparent);
+        }
+
+        h1 {
+            font-size: 4em;
+            font-style: italic;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: #fff;
+            text-shadow: 
+                3px 3px 0 #000,
+                -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                0 0 20px rgba(255, 255, 255, 0.5);
+            white-space: nowrap;
+        }
+
+        .hero-grid {
+            display: flex;
+            gap: 30px;
+            overflow-x: auto;
+            padding: 20px 10px 40px;
+            scroll-behavior: smooth;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-grid::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        .hero-grid::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .hero-grid::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .hero-card {
+            flex-shrink: 0;
+            width: 180px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .hero-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .hero-card.active .card-image-wrapper {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            border-color: #ffd700;
+        }
+
+        .card-image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 240px;
+            transform: perspective(600px) rotateY(-5deg);
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-card:hover .card-image-wrapper {
+            transform: perspective(600px) rotateY(0deg);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .hero-card:hover .hero-image {
+            transform: scale(1.1);
+        }
+
+        .card-info {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hero-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .hero-subtitle {
+            font-size: 0.75em;
+            color: #a0aec0;
+            font-weight: normal;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .hero-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .hero-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-detail {
+            margin-top: 60px;
+            background: linear-gradient(135deg, rgba(26, 32, 44, 0.95), rgba(45, 55, 72, 0.95));
+            border-radius: 20px;
+            padding: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            display: none;
+            animation: slideUp 0.5s ease;
+        }
+
+        .hero-detail.active {
+            display: block;
+        }
+
+        .detail-content {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 50px;
+            align-items: start;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .detail-image-wrapper {
+            position: relative;
+        }
+
+        .hero-detail-image {
+            width: 100%;
+            border-radius: 15px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        .hero-info h2 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            font-style: italic;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+        }
+
+        .hero-role {
+            display: none;
+        }
+
+        .hero-description {
+            line-height: 1.8;
+            color: #cbd5e0;
+            margin-bottom: 35px;
+            font-size: 1.1em;
+        }
+
+        .abilities {
+            margin-top: 25px;
+        }
+
+        .abilities h3 {
+            color: #4299e1;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .ability {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 18px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            border-left: 5px solid #4299e1;
+            transition: all 0.3s ease;
+        }
+
+        .ability:hover {
+            transform: translateX(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #63b3ed;
+        }
+
+        .ability-name {
+            font-weight: bold;
+            color: #63b3ed;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .ability-description {
+            color: #a0aec0;
+        }
+
+        @media (max-width: 1200px) {
+            .detail-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-image-wrapper {
+                max-width: 400px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+            
+            .hero-grid {
+                justify-content: flex-start;
+                flex-wrap: nowrap;
+            }
+            
+            .hero-card {
+                width: 150px;
+            }
+            
+            .card-image-wrapper {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-line">
+                <h1>Pals Select</h1>
+            </div>
+        </header>
+
+        <div class="hero-grid" id="heroGrid"></div>
+
+        <div class="hero-detail" id="heroDetail">
+            <div class="detail-content">
+                <div class="detail-image-wrapper">
+                    <img class="hero-detail-image" id="detailImage" src="" alt="">
+                </div>
+                <div class="hero-info">
+                    <h2 id="detailName"></h2>
+                    <p class="hero-description" id="detailDescription"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const heroes = [
+            {
+                name: "Lamball",
+                subtitle: "Big Floof",
+                icon: "https://palworld.gg/images/icons/T_Icon_element_s_00.png",
+                image: "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2024/03/palworld-lamball-human.jpg",
+                description: "A walk up a hill tends to end with this Pal tumbling back down. This causes it to become dizzy and unable to move, making it easy to capture and kill. As a result, this Pal has tumbled down to the very bottom of the food chain itself."
+            },
+            {
+                name: "Cattiva",
+                subtitle: "The Cat's Pajamas",
+                icon: "https://palworld.gg/images/icons/T_Icon_element_s_00.png",
+                image: "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2024/02/hilarious-palworld-clip-makes-it-look-like-cattiva-is-digivolving-game-rant.jpg",
+                description: "At a glance it appears full of confidence, but it is in fact weak and cowardly. Being toyed with by a PinkCat is in many ways the greatest of disgraces."
+            },
+            {
+                name: "Chikipi",
+                subtitle: "Plump & Juicy",
+                icon: "https://palworld.gg/images/icons/T_Icon_element_s_00.png",
+                image: "https://www.dexerto.com/cdn-image/wp-content/uploads/2024/04/09/palworld-chikipi.jpeg?width=1200&quality=60&format=auto",
+                description: "Extremely weak and far too delicious. It is one of the weakest Pals alongside SheepBall. No matter how many are hunted, they just keep appearing."
+            },
+            {
+                name: "Lifmunk",
+                subtitle: "Coward of the Steppe",
+                icon: "https://palworld.gg/images/icons/T_Icon_element_s_04.png",
+                image: "https://www.gamepur.com/wp-content/uploads/2024/01/Lifmunk-palworld-submachine-gun.jpg",
+                description: "Intelligent as a five to seven-year-old human child. It makes a wonderful partner, but there have been more than a few cases where they've killed their master after learning to use weapons."
+            },
+            
+        ];
+
+        const heroGrid = document.getElementById('heroGrid');
+        const heroDetail = document.getElementById('heroDetail');
+        let currentHero = 0;
+
+        function renderHeroes() {
+            heroes.forEach((hero, index) => {
+                const card = document.createElement('div');
+                card.className = 'hero-card';
+                if (index === 0) card.classList.add('active');
+                
+                card.innerHTML = `
+                    <div class="card-image-wrapper">
+                        <img class="hero-image" src="${hero.image}" alt="${hero.name}">
+                    </div>
+                    <div class="card-info">
+                        <div class="hero-icon">
+                            <img src="${hero.icon}" alt="${hero.name}">
+                        </div>
+                        <div>
+                            <div class="hero-name">
+                                ${hero.name}
+                                <span class="hero-subtitle">${hero.subtitle}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                card.addEventListener('click', () => selectHero(index));
+                heroGrid.appendChild(card);
+            });
+        }
+
+        function selectHero(index) {
+            currentHero = index;
+            const hero = heroes[index];
+            
+            document.querySelectorAll('.hero-card').forEach((card, i) => {
+                card.classList.toggle('active', i === index);
+            });
+
+            document.getElementById('detailImage').src = hero.image;
+            document.getElementById('detailName').textContent = hero.name;
+            document.getElementById('detailDescription').textContent = hero.description;
+
+            heroDetail.classList.add('active');
+            
+            setTimeout(() => {
+                heroDetail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        renderHeroes();
+        selectHero(0);
+    </script>
+</body>
+</html>
