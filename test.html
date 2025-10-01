@@ -1,112 +1,301 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pal Cards</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Palworld Database</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0c0f1a;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+    :root{
+      --bg:#121524;
+      --card:#1b2033;
+      --card-2:#222a44;
+      --text:#f7fafc;
+      --muted:#a0aec0;
+      --brand:#5eead4;
+      --ring:#ffd700;
     }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family: ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;
+      background: radial-gradient(1200px 800px at 20% -20%, #1f2440 0%, transparent 60%) , var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .container{max-width:1400px;margin:0 auto;padding:28px 18px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+    h1{
+      font-size:clamp(22px,3vw,32px);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      font-weight:900;
+    }
+    .tools{
+      display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+    }
+    .search{
+      background:var(--card);
+      border:1px solid rgba(255,255,255,.08);
+      padding:10px 12px;
+      border-radius:12px;
+      min-width:260px;
+      color:var(--text);
+      outline:none;
+    }
+    .pill{
+      padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg,var(--card),var(--card-2));
+      cursor:pointer;font-size:12px;color:var(--muted);
+      transition:all .2s ease;
+    }
+    .pill.active{color:#111;background:var(--brand);border-color:transparent}
+    .grid{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: repeat(7, minmax(160px,1fr));
+      gap:16px;
+    }
+    /* responsive ที่ยังคง “แนวนอน 7 ต่อแถว” บนจอใหญ่ */
+    @media (max-width: 1280px){ .grid{ grid-template-columns: repeat(6, minmax(160px,1fr));}}
+    @media (max-width: 1100px){ .grid{ grid-template-columns: repeat(5, minmax(160px,1fr));}}
+    @media (max-width: 900px){  .grid{ grid-template-columns: repeat(4, minmax(150px,1fr));}}
+    @media (max-width: 700px){  .grid{ grid-template-columns: repeat(3, minmax(140px,1fr));}}
+    @media (max-width: 520px){  .grid{ grid-template-columns: repeat(2, minmax(140px,1fr));}}
 
-    .card {
-      width: 220px;
-      background: linear-gradient(160deg, #1a1f2e, #242c3b);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-      transition: transform 0.2s;
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow:0 8px 24px rgba(0,0,0,.35);
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      cursor:pointer;
+      position:relative;
+      isolation:isolate;
     }
+    .card:hover{
+      transform: translateY(-6px) scale(1.02);
+      box-shadow:0 18px 36px rgba(0,0,0,.45);
+      border-color: rgba(255,215,0,.35);
+    }
+    .media{
+      position:relative;height:160px;background:#0d1122;display:flex;align-items:center;justify-content:center;
+    }
+    .media img{
+      width:100%;height:100%;object-fit:cover;display:block;
+    }
+    .badge-wrap{
+      position:absolute;left:8px;top:8px;display:flex;gap:6px;z-index:2;
+    }
+    .badge{
+      width:26px;height:26px;border-radius:50%;
+      background:rgba(0,0,0,.45);backdrop-filter: blur(3px);
+      border:1px solid rgba(255,255,255,.2);
+      display:grid;place-items:center;overflow:hidden;
+    }
+    .badge img{width:100%;height:100%;object-fit:cover}
+    .badge span{font-size:11px;color:#fff}
+    .content{padding:12px}
+    .name{
+      font-weight:800;line-height:1.2;
+      font-size:clamp(14px,1.8vw,16px); letter-spacing:.02em;
+      text-transform:uppercase;
+    }
+    .subtitle{font-size:12px;color:var(--muted);margin-top:2px}
+    .level{font-size:12px;color:#cbd5e1;margin-top:8px}
+    .hidden{display:none !important;}
 
-    .card:hover {
-      transform: translateY(-8px);
+    /* Drawer (detail) */
+    .drawer{
+      position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);
+      padding:20px;z-index:100;
     }
-
-    .card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
+    .drawer.active{display:grid;}
+    .panel{
+      width:min(920px,94vw);
+      background:linear-gradient(180deg,#14192b,#171e35);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;overflow:hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,.55);
+      animation:pop .18s ease both;
     }
-
-    .card-content {
-      padding: 12px;
-      text-align: center;
+    @keyframes pop{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .panel-head{position:relative;height:300px;background:#0b0f1f}
+    .panel-head img{width:100%;height:100%;object-fit:cover}
+    .panel-head .head-badges{position:absolute;left:12px;top:12px;display:flex;gap:8px}
+    .panel-body{padding:18px 18px 24px}
+    .panel-title{font-size:28px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+    .panel-desc{margin-top:8px;color:#cbd5e1;line-height:1.7}
+    .close{
+      position:absolute;right:12px;top:12px;
+      background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.18);
+      color:#fff;border-radius:10px;padding:8px 10px;cursor:pointer;font-weight:700
     }
-
-    .pal-name {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin: 5px 0;
-    }
-
-    .pal-type {
-      display: inline-flex;
-      align-items: center;
-      background: #333;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      margin-bottom: 8px;
-    }
-
-    .pal-type img {
-      width: 16px;
-      height: 16px;
-      margin-right: 6px;
-    }
-
-    .pal-desc {
-      font-size: 0.85rem;
-      color: #ccc;
-    }
+    .empty{opacity:.7;text-align:center;padding:40px 0}
   </style>
 </head>
 <body>
+  <div class="container">
+    <header>
+      <h1>Pals Select</h1>
+      <div class="tools">
+        <input id="search" class="search" placeholder="ค้นหา Pal..." />
+        <button class="pill" id="clearFilter">ล้างตัวกรอง</button>
+      </div>
+    </header>
 
-  <div id="pal-list"></div>
+    <div id="grid" class="grid"></div>
+    <div id="emptyState" class="empty hidden">ไม่พบผลลัพธ์ที่ตรงกับคำค้นหา</div>
+  </div>
+
+  <!-- Drawer / Detail -->
+  <div id="drawer" class="drawer" aria-hidden="true">
+    <div class="panel">
+      <button id="closeDrawer" class="close">ปิด</button>
+      <div class="panel-head">
+        <div class="head-badges" id="detailBadges"></div>
+        <img id="detailImage" alt="">
+      </div>
+      <div class="panel-body">
+        <div class="panel-title" id="detailName"></div>
+        <div class="subtitle" id="detailSubtitle"></div>
+        <div class="level" id="detailLevel"></div>
+        <p class="panel-desc" id="detailDesc"></p>
+      </div>
+    </div>
+  </div>
 
   <script>
-    // Map type → icon
-    const typeIcons = {
-      Dark: "icons/dark.png",
-      Fire: "icons/fire.png",
-      Water: "icons/water.png",
-      Grass: "icons/grass.png"
-      // เพิ่ม type ตามเกมจริง ๆ ได้
-    };
+    // === Config ===
+    const DATA_URL = "https://d-nattakitti.github.io/Palworlddb_db/pals.json";
+    const ICON_BASE = "images/icons"; // จัดไอคอนในโปรเจกต์ app ของคุณ
 
-    // โหลด JSON
-    fetch("https://d-nattakitti.github.io/Palworlddb_db/pals.json")
-      .then(res => res.json())
+    // เผื่อ type เขียนต่างกัน/มีช่องว่าง → แปลงเป็น slug
+    const slug = s => (s || "").toString().trim().toLowerCase().replace(/\s+/g, "-");
+
+    // ถ้าไม่มีไฟล์ไอคอน ให้ขึ้นอักษรย่อแทน
+    function typeBadge(t){
+      const s = slug(t);
+      const src = `${ICON_BASE}/${s}.webp`;
+      // ใช้รูป ถ้าโหลดไม่ได้ก็ fallback เป็นอักษรย่อ
+      const abbr = (t||"?").slice(0,2).toUpperCase();
+      return `
+        <div class="badge" title="${t}">
+          <img src="${src}" alt="${t}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'${abbr}'}))">
+        </div>
+      `;
+    }
+
+    // State
+    let pals = [];
+    let filtered = [];
+
+    const $grid = document.getElementById("grid");
+    const $search = document.getElementById("search");
+    const $empty = document.getElementById("emptyState");
+    const $clear = document.getElementById("clearFilter");
+
+    // Drawer refs
+    const $drawer = document.getElementById("drawer");
+    const $detailImg = document.getElementById("detailImage");
+    const $detailBadges = document.getElementById("detailBadges");
+    const $detailName = document.getElementById("detailName");
+    const $detailSubtitle = document.getElementById("detailSubtitle");
+    const $detailLevel = document.getElementById("detailLevel");
+    const $detailDesc = document.getElementById("detailDesc");
+    const $closeDrawer = document.getElementById("closeDrawer");
+
+    // Fetch JSON
+    fetch(DATA_URL)
+      .then(r => r.json())
       .then(data => {
-        const list = document.getElementById("pal-list");
-
-        data.forEach(pal => {
-          const card = document.createElement("div");
-          card.className = "card";
-
-          card.innerHTML = `
-            <img src="${pal.image}" alt="${pal.name}">
-            <div class="card-content">
-              <div class="pal-name">${pal.name}</div>
-              <div class="pal-type">
-                <img src="${typeIcons[pal.type] || 'icons/default.png'}" alt="${pal.type}">
-                ${pal.type}
-              </div>
-              <div class="pal-desc">${pal.description || "No description."}</div>
-            </div>
-          `;
-
-          list.appendChild(card);
-        });
+        pals = Array.isArray(data) ? data : (data.pals || []);
+        filtered = pals.slice();
+        renderGrid(filtered);
+      })
+      .catch(err => {
+        console.error("โหลด JSON ไม่ได้:", err);
+        $grid.innerHTML = "<div class='empty'>โหลดข้อมูลไม่สำเร็จ</div>";
       });
-  </script>
 
+    function renderGrid(list){
+      $grid.innerHTML = "";
+      if(!list.length){
+        $empty.classList.remove("hidden");
+        return;
+      }
+      $empty.classList.add("hidden");
+
+      list.forEach(pal => {
+        const types = Array.isArray(pal.type) ? pal.type : (pal.type ? [pal.type] : []);
+        const typeBadges = types.map(typeBadge).join("");
+
+        // การ์ด 1 ใบ
+        const card = document.createElement("article");
+        card.className = "card";
+        card.tabIndex = 0; // ให้โฟกัสด้วยคีย์บอร์ดได้
+
+        card.innerHTML = `
+          <div class="media">
+            <div class="badge-wrap">${typeBadges}</div>
+            <img loading="lazy" src="${pal.image || ""}" alt="${pal.name || "Pal"}">
+          </div>
+          <div class="content">
+            <div class="name">${pal.name || "Unknown"}</div>
+            <div class="subtitle">${pal.subtitle || ""}</div>
+            ${pal.level ? `<div class="level">Lv. ${pal.level}</div>` : ""}
+          </div>
+        `;
+
+        // คลิกแล้วเปิดรายละเอียด
+        card.addEventListener("click", () => openDetail(pal));
+        card.addEventListener("keydown", (e)=>{ if(e.key==="Enter") openDetail(pal); });
+
+        $grid.appendChild(card);
+      });
+    }
+
+    // Search แบบ realtime
+    $search.addEventListener("input", e => {
+      const q = e.target.value.trim().toLowerCase();
+      filtered = pals.filter(p => {
+        const name = (p.name || "").toLowerCase();
+        const subtitle = (p.subtitle || "").toLowerCase();
+        const types = Array.isArray(p.type) ? p.type.join(" ").toLowerCase() : (p.type||"").toLowerCase();
+        return name.includes(q) || subtitle.includes(q) || types.includes(q);
+      });
+      renderGrid(filtered);
+    });
+
+    // ล้างตัวกรอง
+    $clear.addEventListener("click", ()=>{
+      $search.value = "";
+      filtered = pals.slice();
+      renderGrid(filtered);
+    });
+
+    // Drawer controls
+    function openDetail(p){
+      const types = Array.isArray(p.type) ? p.type : (p.type ? [p.type] : []);
+      $detailBadges.innerHTML = types.map(typeBadge).join("");
+      $detailImg.src = p.image || "";
+      $detailImg.alt = p.name || "Pal";
+
+      $detailName.textContent = p.name || "Unknown";
+      $detailSubtitle.textContent = p.subtitle || "";
+      $detailLevel.textContent = p.level ? `Level: ${p.level}` : "";
+      $detailDesc.textContent = p.description || "—";
+
+      $drawer.classList.add("active");
+      $drawer.setAttribute("aria-hidden","false");
+    }
+
+    function closeDetail(){
+      $drawer.classList.remove("active");
+      $drawer.setAttribute("aria-hidden","true");
+    }
+    $closeDrawer.addEventListener("click", closeDetail);
+    $drawer.addEventListener("click", (e)=>{ if(e.target === $drawer) closeDetail(); });
+    window.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeDetail(); });
+  </script>
 </body>
 </html>
